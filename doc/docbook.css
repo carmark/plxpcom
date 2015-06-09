@@ -1,0 +1,417 @@
+a:link {
+  text-decoration: none;
+  background: transparent;
+  color: #00c;
+}
+
+a:visited {
+  text-decoration: none;
+  background: transparent;
+  color: #609;
+}
+
+a:active {
+  text-decoration: underline;
+  background: transparent;
+  color: #c00;
+}
+
+a:hover {
+  text-decoration: underline;
+  background: #ccffff;
+  color: #00c;
+}
+
+b {
+   font-family: helvetica, arial, sans-serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: bold;
+   font-size: 10pt;
+   color: #333366;
+   background-color: transparent;
+}
+
+h2 {
+   font-family: helvetica, arial, sans-serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: bold;
+   font-size: 10pt;
+   color: #333366;
+   background-color: transparent;
+}
+
+h2.mtitle {
+   font-family: helvetica, arial, sans-serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: bold;
+   font-size: 12pt;
+   text-decoration: underline;
+   margin-top: 1%;
+   margin-bottom: 0%;
+   color: #354170;
+   background-color: transparent;
+}
+
+h2.sect1 {
+   font-family: helvetica, arial, sans-serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: bold;
+   font-size: large;
+   text-decoration: underline;
+   margin-top: 1%;
+   margin-bottom: 0%;
+   color: #333366;
+   background-color: transparent;
+}
+
+body {
+   font-family: helvetica, arial, sans-serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: normal;
+   font-size: 10pt;
+   margin-top: 0px;
+   margin-right: 5%;
+   margin-bottom: 5%;
+   margin-left: 5%;
+   padding-left: 2%;
+   padding-right: 5%;
+   color: #000000;
+   background-color: #FFFFFF;
+   border-style: none none none none;
+}
+
+p {
+   font-family: helvetica, arial, sans-serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: normal;
+   font-size: 10pt;
+	 text-indent: 0;
+}
+
+p.para {
+   font-family: helvetica, arial, sans-serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: normal;
+   font-size: 10pt;
+   text-indent: 0;
+   text-align: left;
+}
+
+p.codetext {
+   font-family: courier, monospaced, serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: normal;
+   font-size: 10pt;
+	 background: #E0E0E0;
+	 color: #000000;
+	 text-indent: 0;
+}
+
+p.note {
+   font-family: helvetica, arial, sans-serif;
+   font-style: italic;
+   font-variant: normal;
+   font-weight: normal;
+   font-size: 10pt;
+   color: #333366;
+   margin-right: 15%;
+   margin-left: 15%;
+   background-color: transparent;
+	 text-indent: 0;
+}
+
+p.logo {
+  font-family: helvetica, arial, sans-serif;
+  font-size: larger;
+  color: #FFFFFF;
+  background-color: #354170;
+  font-weight: bold;
+}
+
+p.titlestyle {
+  font-family: helvetica, arial, sans-serif;
+  font-size: 10pt;
+  color: #FFFFFF;
+  background-color: transparent;
+  font-weight: bold;
+}
+
+img.note {
+  float: left;
+  margin-top: 1%;
+  padding-top: 2%;
+  padding-right: 2%;
+  padding-bottom: 2%;
+}
+
+ol {
+   font-family: helvetica, arial, sans-serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: normal;
+   font-size: 10pt;
+   text-indent: 0;
+}
+
+ul {
+   font-family: helvetica, arial, sans-serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: normal;
+   font-size: 10pt;
+   text-indent: 0;
+}
+
+li {
+   font-family: helvetica, arial, sans-serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: normal;
+   font-size: 10pt;
+   text-indent: 0;
+}
+
+div.codetext {
+   font-family: courier, monospaced, serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: normal;
+   font-size: 10pt;
+	 padding-left: 5%;
+	 padding-right: 5%;
+   background: #E0E0E0;
+   color: #000000;
+   text-indent: 0;
+}
+
+div.sectmargin {
+  margin-left: 3%;
+  margin-right: 37%;
+  margin-top: 0.5%;
+  margin-bottom: 0.5%;
+}
+
+div.section {
+  text-align: left;
+}
+
+div.sect2 {
+  padding-left: 3%;
+}
+
+div.sect3 {
+  padding-left: 3%;
+}
+
+form {
+   font-family: helvetica, arial, sans-serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: normal;
+   font-size: 10pt;
+}
+
+input {
+   font-family: helvetica, arial, sans-serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: normal;
+   font-size: 10pt;
+}
+
+textarea {
+   font-family: helvetica, arial, sans-serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: normal;
+   font-size: 10pt;
+}
+
+select {
+   font-family: helvetica, arial, sans-serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: normal;
+   font-size: 10pt;
+}
+
+option {
+   font-family: helvetica, arial, sans-serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: normal;
+   font-size: 10pt;
+}
+
+pre {
+   font-family: courier, monospaced, serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: normal;
+   font-size: 10pt;
+	 background: #E0E0E0;
+	 color: #000000;
+	 text-indent: 0;
+}
+
+i {
+   font-family: helvetica, arial, sans-serif;
+   font-style: italic;
+   font-variant: normal;
+   font-weight: normal;
+   font-size: 10pt;
+   color: #333366;
+   background: #FFFFFF;
+}
+
+h2.title {
+   font-family: helvetica, arial, sans-serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: bold;
+   font-size: 12pt;
+   text-decoration: underline;
+   margin-top: 1%;
+   margin-bottom: 0%;
+   color: #354170;
+   background-color: transparent;
+}
+
+h3.title {
+   font-family: helvetica, arial, sans-serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: bold;
+   font-size: 11pt;
+   text-decoration: underline;
+   margin-top: 1%;
+   margin-bottom: 0%;
+   color: #354170;
+   background-color: transparent;
+}
+
+h4.title {
+   font-family: helvetica, arial, sans-serif;
+   font-style: normal;
+   font-variant: normal;
+   font-weight: bold;
+   font-size: 10pt;
+   text-decoration: underline;
+   margin-top: 1%;
+   margin-bottom: 0%;
+   color: #354170;
+   background-color: transparent;
+}
+
+span.section {
+	 font-family: helvetica, arial, sans-serif;
+   font-weight: bold;
+   font-size: 10pt;
+   color: #FFFFFF;
+	 background: #333366;
+}
+
+span.literal {
+  font-family: courier, monospaced, serif;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  font-size: 10pt;
+}
+
+tt {
+  font-family: courier, monospaced, serif;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  font-size: 10pt;
+  color: #666633;
+  background-color: transparent;
+}
+
+span.column {
+  font-family: helvetica, arial, sans-serif;
+  font-style: normal;
+  font-variant: normal;
+  font-weight: normal;
+  font-size: 10pt;
+  color: #000000;
+  background-color: transparent;
+  text-indent: 0;
+}
+
+span.progressbar {
+  font-family: helvetica, arial, sans-serif;
+  font-size: 10pt;
+  font-weight: bold;
+  color: #333366;
+  background-color: transparent;
+}
+
+table.normal {
+  float: none;
+}
+
+table.code {
+  color: #FFFFFF;
+  background-color: #E0E0E0;
+}
+
+table.groupouter {
+  margin-top: 1%;
+  margin-bottom: 1%;
+}
+
+table.groupinner {
+  color: #FFFFFF;
+  background-color: #333366;
+}
+
+table.groupbody {
+  color: #FFFFFF;
+  background-color: #E1E3EC;
+  border: #333366 solid 2px;
+}
+
+td.header {
+  font-family: helvetica, arial, sans-serif;
+  font-size: 10pt;
+  font-weight: bold;
+  color: #333366;
+}
+
+td.column {
+  font-family: helvetica, arial, sans-serif;
+  font-weight: normal;
+  color: #000000;
+  font-size: 10pt;
+}
+
+#PCL {
+		font-family: verdana, helvetica, arial, sans-serif;
+		font-style: normal;
+		font-weight: normal;
+		text-decoration: none;
+		font-size: 10pt;
+}
+
+#PTT {
+		font-family: verdana, helvetica, arial, sans-serif;
+		font-size: 10pt;
+		font-weight: bold;
+		color: #FFFFFF;
+		background: #111166;
+}
+
+#PST {
+		font-family: verdana, helvetica, arial, sans-serif;
+		font-size: 10pt;
+}

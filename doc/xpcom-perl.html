@@ -1,0 +1,425 @@
+<html><head>
+      <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+   <title>Chapter 1. Architecture and Overview of the Perl XPCOM Interface</title><link rel="stylesheet" href="docbook.css" type="text/css"><meta name="generator" content="DocBook XSL Stylesheets V1.29"></head><body bgcolor="white" text="black" link="#0000FF" vlink="#840084" alink="#0000FF"><div id="d35e1" class="chapter"><div class="titlepage"><div><h2 class="title"><a name="d35e1"></a>Chapter 1. Architecture and Overview of the Perl XPCOM Interface</h2></div></div><div class="toc"><p><b>Table of Contents</b></p><dl><dt> <a href="#d35e4">Objectives of Perl XPCOM</a></dt><dd><dl><dt> <a href="#d35e11">Current Limitations of the Perl XPCOM Interface</a></dt></dl></dd><dt> <a href="#d35e33">Using XPCOM Components from Perl</a></dt><dd><dl><dt> <a href="#d35e38">The Components Package</a></dt><dt> <a href="#d35e185">The nsISupports Package</a></dt></dl></dd><dt> <a href="#d35e243">Implementing XPCOM Components in Perl</a></dt><dd><dl><dt> <a href="#d35e246">Creating a Perl Component Module</a></dt></dl></dd><dt> <a href="#d35e336">Assorted Implementation Idioms</a></dt><dd><dl><dt> <a href="#d35e341">Convenience Macros</a></dt><dt> <a href="#components.wrapobject">When Components::WrapObject() Isn't Cheating</a></dt></dl></dd></dl></div><div class="sect1"><a name="d35e4"></a><div class="titlepage"><div><h2 class="title" style="clear: all"><a name="d35e4"></a><span class="title">Objectives of Perl XPCOM</span></h2></div></div><p>With support for languages such as C++, Java, JavaScript, and Python,
+one may ask, "why an XPCOM interface to Perl?" The answer is quite simple, Perl
+is one of the most widely used scripting languages around. It is also well known 
+for the wide variety of extension modules and libraries available for it. By
+making use of XPCOM, developers can create libraries of native class objects and 
+have them instantly accessible to the Perl interpreter, without the need writing 
+custom bindings with tools such as XS and SWIG. This alone is enough reason to 
+justify the existence of XPCOM support for Perl. Such a tool is particularly
+advantageous to developers using perl as an embedded interpreter to provide
+scripting capabilities in a larger application, which was the initial impetus
+for creating this extension.
+</p><p>By adding the capability to implement XPCOM interfaces in Perl,
+the language becomes a first class citizen in the XPCOM world. Perl's
+flexibility allows for the quick implementation of interfaces, making it useful
+for both prototyping components and for use as a RAD tool.</p><div class="sect2"><a name="d35e11"></a><div class="titlepage"><div><h3 class="title"><a name="d35e11"></a><span class="title">Current Limitations of the Perl XPCOM Interface</span></h3></div></div><p>In the current implementation of the XPCOM interface for Perl, the
+following functionality is not implemented:
+<div class="itemizedlist"><ul><li><p><a name="d35e17"></a>Array arguments (e.g. [array, size_is(n)] in string foo) are
+not fully supported. Support for calling methods with array input arguments
+works, but array outputs ar enot implemented yet, nor is the ability to
+implement methods with array arguments in Perl.</p></li><li><p><a name="d35e20"></a>Perl XPCOM components must run in one thread only. Threads can 
+be invoked (e.g. creating instances of <tt>nsIRunnable</tt> and
+dispatching them to an <tt>nsIThread</tt> or
+<tt>nsIThreadPool</tt> works, but Perl code itself cannot be executed
+in multiple threads. This is because Perl itself is not entirely thread safe, so 
+this situation is not likely to change. Assume a general warning of 'There Be
+Dragons Here' when dealing with threads in Perl. Any help in better
+understanding threading with regard to Perl would be appreciated.</p></li></ul></div>
+</p></div></div><div class="sect1"><a name="d35e33"></a><div class="titlepage"><div><h2 class="title" style="clear: all"><a name="d35e33"></a><span class="title">Using XPCOM Components from Perl</span></h2></div></div><p>The Perl XPCOM extension is provided as a standard Perl module. This
+module allows access to the XPCOM library and XPCOM components from Perl. The
+module is named, simply enough, XPCOM. In reality, this module defines several
+packages, they are simply all packaged into a single module for simplicity,
+since nearly all the packages are required for nearly any use of the
+extension.</p><div class="sect2"><a name="d35e38"></a><div class="titlepage"><div><h3 class="title"><a name="d35e38"></a><span class="title">The Components Package</span></h3></div></div><p>The package named <tt>Components</tt> in the XPCOM
+extension provides Perl's interface to the XPCOM libraries component
+manager. Through this package, new objects are instantiated and component
+services are obtained. In addition, all global XPCOM actions reside under the
+Components namespace.</p><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title"><a name="d35e46">Note</a></h3><p>Originally, the Components package resided under the
+<tt>XPCOM::Components</tt> namespace. Despite being the proper way for 
+arranging the namespaces in such a package, it was quickly decided that it was
+too verbose to be practical.</p></div><p>The following functions and variables are defined under the
+Components package:
+<div class="itemizedlist"><ul><li><p><a name="d35e55"></a><a href="#components.classes.interfaces"><tt>%Components::classes</tt></a> - A hash variable
+containing all registered classes.</p></li><li><p><a name="d35e61"></a><a href="#components.classes.interfaces"><tt>%Components::interfaces</tt></a> - A hash variable
+containing all registered interfaces.</p></li><li><p><a name="d35e67"></a><a href="#components.retcodes"><tt>$Components::returnCode</tt></a> - A scalar variable 
+containing the return code set by the last call to an XPCOM subroutine or method 
+of an XPCOM component.</p></li><li><p><a name="d35e73"></a><a href="#components.classes.interfaces"><tt>Components::Classes($anID)</tt></a> - A
+subroutine which obtains component classes by contract ID.</p></li><li><p><a name="d35e79"></a><a href="#components.classes.interfaces"><tt>Components::Interfaces($anIFace)</tt></a> - A
+subroutine which obtains interfaces by name.</p></li><li><p><a name="d35e85"></a><a href="#components.constructor"><tt>Components::Constructor($contractID, 
+$iid)</tt></a> - Convenience method for creating an object and
+performing a QueryInterface call on it.</p></li><li><p><a name="d35e91"></a><a href="#components.retcodes"><tt>Components::isSuccessCode($nsresult)</tt></a>
+- Returns a boolean true or false if the given return code is a success code or not.</p></li><li><p><a name="d35e97"></a><a href="#components.getservice"><tt>Components::GetService($cid, $iid)</tt></a> -
+Obtains a service from the service manager by contract ID and interface ID.</p></li><li><p><a name="d35e103"></a><tt>Components::ID($idString)</tt> - Creates
+an <tt>nsID</tt> object from a uuid string.</p></li><li><p><a name="d35e111"></a><tt>Components::Manager()</tt> - This method 
+returns a handle on the global component manager.</p></li><li><p><a name="d35e116"></a><a href="#components.wrapobject"><tt>Components::WrapObject($obj, $iid)</tt></a>
+- Wraps a perl blessed object in an XPCOM interface. This should generally be
+avoided except for certain cases, which will be covered further on.</p></li></ul></div>
+</p><div class="sect3"><a name="components.classes.interfaces"></a><div class="titlepage"><div><h4 class="title"><a name="components.classes.interfaces"></a><span class="title">The Components::classes and Components::interfaces Hashes</span></h4></div></div><p>The classes and interfaces hashes within the Components package
+provide convenient access points to XPCOM objects. They are actually implemented 
+as tied hashes to the Components::Classes and Components::Interfaces
+subroutines. The classes hash takes a contract ID string as a key and returns an 
+instance of the class matching that ID or <tt>undef</tt> if no such
+class exists. The interfaces hash takes an interface name as a key and returns
+an <tt>nsID</tt> object representing the interface or
+<tt>undef</tt> if no such interface exists.</p><p>The classes and interfaces hashes are only thin wrappers around
+Components::Classes() and Components::Interfaces(). The key values of the two
+hashes are simply passed as the argument to their tied subroutines. The hashes
+exist, and are encouraged to be the preferred means of access, to be more
+conformant to the approach used in Mozilla's JavaScript XPCOM
+implementation.</p><p>The following example demonstrates how to use the classes and
+interfaces hashes to obtain instances of XPCOM components which can them be used 
+from Perl.</p><div class="figure"><p><a name="xp-perl.example1"></a><b>Figure 1.1. Creating an instance of an XPCOM component</b></p><pre class="programlisting">#!/usr/bin/perl
+use XPCOM;
+
+# Create an instance of of an object. The value returned supports 
+# the nsISupports interface implicitly
+my $class = $Components::classes{'@mozilla.org/sample;1'};
+
+# Call QueryInterface on the class to get a handle on it in the interface 
+# we want.
+my $iface = $class-&gt;QueryInterface($Components::interfaces{nsISample});
+
+# We now have a usable object which we can invoke interface methods on.
+$iface-&gt;writeValue("Hello World!");
+
+</pre></div><p>The method of object creation in the previous example is the
+formal way of creating an instance of an XPCOM object. As a convenience, you may 
+use the <tt><a name="components.constructor"></a>Components::Constructor()</tt> method, which takes a
+contract ID string and an interface ID as its arguments.</p></div><div class="sect3"><a name="components.retcodes"></a><div class="titlepage"><div><h4 class="title"><a name="components.retcodes"></a><span class="title">Checking the Status of Method Calls</span></h4></div></div><p>The Perl XPCOM package provides a standardized means of reporting
+the success or failure of an action using XPCOM's error code system. The return
+code of all calls to the Components package and the return code of any method of 
+an XPCOM object goes into <tt>$Components::returnCode</tt> and is
+valid until the next call to another XPCOM method. This behavior can be relied
+upon by the programmer, any deviation from this behavior is an error that needs
+to be corrected. In addition, the Components package has the convention of
+returning <tt>undef</tt> in the event of an error in calls to any of
+its members.</p><p>The Components::isSuccessCode() subroutine provides a convenience
+mechanism for checking whether a return code is a success or failure return
+code. In addition, the major XPCOM return code values have defined constants
+under the <tt>Components::results::</tt> namespace. The following
+example code demonstrates checking a return for success or failure and dealing
+with specific return values.</p><div class="figure"><p><a name="d35e167"></a><b>Figure 1.2. XPCOM Return Code Handling</b></p><pre class="programlisting">#!/usr/bin/perl
+use XPCOM;
+
+my $class = $Components::classes{'@mozilla.org/sample;1'};
+
+# the classes hash will return undef if no class exists for the contract ID, 
+# so just die here if we have no class.
+if(!defined($class)) die "Unable to create instance of class.";
+
+my $iface = $class-&gt;QueryInterface($Components::interfaces{nsISample});
+# Check the return code if we succeeded
+if(Components::isSuccessCode($Components::returnCode)) {
+  $iface-&gt;writeValue("Hello World!");
+} else {
+  # Now check if is a no interface error or something else.
+  if($Components::returnCode == Components::results::NS_NOINTERFACE) {
+    die "Class does not support the nsISample interface.";
+  } else {
+    die "Ack! Some unexpected error occurred.";
+  }
+}
+</pre></div></div><div class="sect3"><a name="components.getservice"></a><div class="titlepage"><div><h4 class="title"><a name="components.getservice"></a><span class="title">Accessing Services</span></h4></div></div><p>Access to the XPCOM service manager is provided through the
+<tt>Components::GetService</tt> subroutine. This is used for obtaining 
+handles on global component objects, referred to as services. An example of a
+service would be the category manager. The next example demonstrates how to
+obtain a handle on the category manager.</p><div class="figure"><p><a name="d35e180"></a><b>Figure 1.3. Obtaining a service object</b></p><pre class="programlisting">#!/usr/bin/perl
+use XPCOM;
+
+# Fetch a service by providing the contract ID of the service components and 
+# its interface ID. GetService sets returnCode accordingly and will return undef
+# on failure.
+my $service = Components::GetService('@mozilla.org/categorymanager;1',
+                                                        $Components::interfaces{nsICategoryManager});
+if(Components::isSuccessCode($Components::returnCode)) {
+  $service-&gt;addCategoryEntry("foo", "bar", "baz", 1, 1);
+}
+</pre></div></div></div><div class="sect2"><a name="d35e185"></a><div class="titlepage"><div><h3 class="title"><a name="d35e185"></a><span class="title">The nsISupports Package</span></h3></div></div><p>Perl XPCOM implements access to component objects through the
+nsISupports package. All XPCOM components in Perl are blessed into this
+package. Much like XPCOM's nsISupports interface, the nsISupports package can
+point to any component. Accessing component methods and attributes looks much like it would in
+C++ or JavaScript.</p><div class="sect3"><a name="d35e190"></a><div class="titlepage"><div><h4 class="title"><a name="d35e190"></a><span class="title">Component Method Access</span></h4></div></div><p>As mentioned, calling a method on an XPCOM object is pretty
+straight forward. Method names match the names defined in an interface's IDL
+description in terms of case sensitivity. In a previous <a href="#xp-perl.example1">example</a>, accessing the method 
+<tt>writeValue</tt> from the <tt>nsISample</tt>
+interface is demonstrated. Where Perl deviates from the method invokation
+conventions seen in other languages, C++ for example, all method argument
+specified as <tt>out</tt> arguments in the IDL definition are returned 
+in a list context as the return value of the method call. For example, take the
+following interface:</p><pre class="programlisting">
+interface nsIFoo : nsISupports {
+  void myMethod(in string foo, in short bar, out string baz, out short bang);
+};
+</pre><p>In Perl calling the method, <tt>myMethod</tt> on
+an object implementing the <tt>nsIFoo</tt> interface would look like
+this:</p><pre class="programlisting">
+# Arguments baz and bang are output arguments, so they are returned as a list.
+  my ($baz, $bang) = $aFoo-&gt;myMethod("foo", 5);
+</pre></div><div class="sect3"><a name="d35e219"></a><div class="titlepage"><div><h4 class="title"><a name="d35e219"></a><span class="title">Using Interface Attributes</span></h4></div></div><p>Interface attributes are treated as subroutines in Perl. Any
+attribute that allows its value to be set can be modified by calling a function
+of the same name as the attribute with a single argument. Fetching the value of
+an attribute is done by calling a function of the same name with no
+arguments. The following example demonstrates this.</p><pre class="programlisting">
+# Example of setting and getting the value of attribute myAttribute from an
+# object.
+
+# Set myAttribute
+  $anObject-&gt;myAttribute("Foo!");
+
+# Get myAttribute's value
+  my $value = $anObject-&gt;myAttribute();
+</pre></div><div class="sect3"><a name="d35e226"></a><div class="titlepage"><div><h4 class="title"><a name="d35e226"></a><span class="title">Accessing Interface Constants</span></h4></div></div><p>Constants defined by an interface can be accessed from the
+interfaces has or via a perl XPCOM object.. Consider the
+following interface:</p><pre class="programlisting">
+interface nsIFoo : nsISupports {
+  const short MY_CONSTANT = 42;
+};
+</pre><p>Accessing the value of <tt>MY_CONSTANT</tt> from the
+interfaces hash or via an instance of an <tt>nsIFoo</tt> object would look like this:</p><pre class="programlisting">
+# Accessing from the interface directly
+  my $value1 = $Components::interfaces{nsIFoo}-&gt;MY_CONSTANT;
+# Access from an already created object.
+  my $value2 = $aFoo-&gt;MY_CONSTANT;
+</pre></div></div></div><div class="sect1"><a name="d35e243"></a><div class="titlepage"><div><h2 class="title" style="clear: all"><a name="d35e243"></a><span class="title">Implementing XPCOM Components in Perl</span></h2></div></div><div class="sect2"><a name="d35e246"></a><div class="titlepage"><div><h3 class="title"><a name="d35e246"></a><span class="title">Creating a Perl Component Module</span></h3></div></div><p>XPCOM components implemented in Perl are created by writing Perl
+modules which define packages that allow for registering and loading an XPCOM 
+component (or components), as well as the implementation of the component. As
+the motto for Perl is "There's More Than One Way To Do It", the same holds true
+in creating XPCOM Perl modules, however this document is going to discuss only a 
+single approach, which is the most straight forward approach and avoid resorting 
+to too much confusion and trickery.</p><p>The first step in creating a Perl XPCOM module is to create the
+module bootstrapping package. The name of this package <i>must</i> 
+be the same as the name of the module file it is written in that will reside in
+XPCOM's components directory. By way of example, this document will walk through 
+a Perl implementation of the nsISample interface that is included with the XPCOM
+library as a demonstration. The first step is to create the module file,
+<tt>nsSample.pm</tt>, and define the bootstrapping package
+<tt>nsSample</tt>. The following figure shows the code of the nsSample 
+package:</p><div class="figure"><p><a name="d35e262"></a><b>Figure 1.4. The nsSample bootstrapping package</b></p><pre class="programlisting">
+package nsSample;
+use strict;
+use XPCOM;
+
+sub GetModule {
+  my ($compMgr, $fileSpec) = @_;
+  my $module = new nsSample::Module;
+  $Components::returnCode = Components::results::NS_OK;
+  return $module;
+}
+</pre></div><p>Programmers experienced with writing XPCOM modules in C++ will
+probably notice that this package closely parallels the
+<tt>NSGetModule</tt> function used by XPCOM's native component
+loader. This is, in fact, the direct Perl equivalent. All Perl XPCOM modules
+must implement a <tt>GetModule</tt> subroutine in a package matching
+the same name as the module file. The perl component loader expects to find this 
+subroutine and will not load the module unless it exists. The GetModule
+subroutine is quite simple, it merely creates an instance of a perl object which 
+implements the <tt>nsIModule</tt> interface for this module. In
+keeping with the walkthrough example, the following figure lists the 
+<tt>nsSample::Module</tt> package.</p><div class="figure"><p><a name="d35e281"></a><b>Figure 1.5. The nsSample::Module package</b></p><pre class="programlisting">
+package nsSample::Module;
+use strict;
+use XPCOM;
+
+sub new {
+  my $self =
+     {
+       firstTime  =&gt; PR_TRUE,
+       myCID      =&gt; Components::ID('{40a6de81-fac6-498e-b86d-d0f6063e4bdc}'),
+       myProgID   =&gt; '@mozilla.org/perlsample;1',
+       myFactory  =&gt; new nsSample::Factory()
+     };
+  bless $self, 'nsSample::Module';
+  $Components::returnCode = Components::results::NS_OK;
+  return $self;
+}
+
+sub registerSelf {
+  my ($pkg, $compMgr, $fileSpec, $location, $type) = @_;
+  if($pkg-&gt;{firstTime} == PR_TRUE) {
+    $pkg-&gt;{firstTime} = PR_FALSE;
+    $Components::returnCode =
+      Components::results::NS_ERROR_FACTORY_REGISTER_AGAIN;
+  }
+  $compMgr-&gt;registerComponentWithType($pkg-&gt;{myCID},
+                                      "Sample Perl Component",
+                                      $pkg-&gt;{myProgID},
+                                      $fileSpec,
+                                      $location,
+                                      PR_TRUE,
+                                      PR_TRUE,
+                                      $type);
+ 
+  $Components::returnCode = Components::results::NS_OK;
+}
+
+sub getClassObject {
+  my ($pkg, $compMgr, $cid, $iid) = @_;
+  if(!$cid-&gt;equals($pkg-&gt;{myCID})) {
+    $Components::returnCode = Components::results::NS_ERROR_NO_INTERFACE;
+    return undef;
+  }
+  if(!$iid-&gt;equals($Components::interfaces{'nsIFactory'})) {
+    $Components::returnCode = Components::results::NS_ERROR_NOT_IMPLEMENTED;
+    return undef;
+  }
+  $Components::returnCode = Components::results::NS_OK;
+  return $pkg-&gt;{myFactory};
+}
+
+</pre></div><div class="note" style="margin-left: 0.5in; margin-right: 0.5in;"><h3 class="title"><a name="d35e286">Note</a></h3><p>Notice the use of the PR_TRUE and PR_FALSE constants in the
+example. The XPCOM module exports these symbols implicitly for convenience and
+to keep code looking familiar to C++ component writers.</p></div><p>This example implements the required subroutines that any module
+package must implement: a constructor, <tt>registerSelf</tt>,
+and <tt>getClassObject</tt>. The module described does all the
+basics necessary for a module, it defines a CID, and contract ID for the
+component it provides, as well as a factory object for the component. It
+registers the component with the component manager in 
+<tt>registerSelf</tt>, and returns the component factory in 
+<tt>getClassObject</tt>. This pattern of module implementation
+closely follows the JavaScript method and should be practiced for
+consistency. However, you are free to implement a module in any means preferred, 
+e.g. Keeping the CID and contract ID in the factory package and referencing it
+when registering the component, etc. This example registers only a single
+component, however it is possible to have multiple components and/or
+factories. The XPCOM perl package also comes with GenericModule and
+GenericFactory packages which can be used to implement the module and factory
+aspects of a component package quickly and easily.</p><p>After the module package is implemented, the next step is to
+define the component factory. The factory is responsible for creating new
+instances of a component object. The next figure shows the code to an example
+Perl factory package:</p><div class="figure"><p><a name="d35e305"></a><b>Figure 1.6. The nsSample::Factory Package</b></p><pre class="programlisting">package nsSample::Factory;
+use strict;
+use XPCOM;
+
+sub new {
+  my $self = {};
+  bless $self, 'nsSample::Factory';
+  $Components::returnCode = Components::results::NS_OK;
+  return $self;
+}
+
+sub createInstance {
+  my ($pkg, $outer, $iid) = @_;
+  if($outer) {
+    $Components::returnCode = Components::results::NS_ERROR_NO_AGGREGATION;
+    return undef;
+  }
+  my $sample = new nsSample::SampleImpl();
+  $Components::returnCode = Components::results::NS_OK;
+  # Don't call QueryInterface on the object yet! The native wrapper around the 
+  # perl factory class takes care of that. The object as it exists here is not 
+  # a 'real' XPCOM object yet.
+  return $sample;
+}
+</pre></div><p>The factory implementation is pretty straight forward. In fact,
+for nearly all cases, the GenericFactory package should be sufficient.</p><p>The final step is to implement the actual component. This is where 
+we finally get to the meat of the package, all the prior steps in our example
+are fairly boilerplate tasks. The common factor shared among the actual
+component implementation packages is that they must implement a constructor, and 
+the <tt>QueryInterface</tt> method. The final figure in this
+section shows the implementation of the sample component:</p><div class="figure"><p><a name="d35e317"></a><b>Figure 1.7. The nsSample::SampleImpl Package</b></p><pre class="programlisting">package nsSample::SampleImpl;
+use strict;
+use XPCOM;
+
+sub new {
+  my $self = { value  =&gt; '&lt;default value&gt;' };
+  bless $self, 'nsSample::SampleImpl';
+  $Components::returnCode = Components::results::NS_OK;
+  return $self;
+}
+
+sub writeValue {
+  my ($pkg, $aPrefix) = @_;
+  print "nsSample::writeValue =&gt; $aPrefix".$pkg-&gt;{value}."\n";
+  $Components::returnCode = Components::results::NS_OK;
+}
+
+sub value {
+  my ($pkg, $aValue) = @_;
+  if(defined($aValue)) {
+    $pkg-&gt;{value} = $aValue;
+  } else {
+    return $pkg-&gt;{value};
+  }
+}
+
+sub poke {
+  my ($pkg, $aValue) = @_;
+  $pkg-&gt;{value} = $aValue;
+  $Components::returnCode = Components::results::NS_OK;
+}
+
+sub QueryInterface {
+  my ($pkg, $iid) = @_;
+  if(!$iid-&gt;equals($Components::interfaces{'nsISample'}) &amp;&amp;
+     !$iid-&gt;equals($Components::interfaces{'nsISupports'})) {
+    $Components::returnCode = Components::results::NS_ERROR_NO_INTERFACE;
+  } else {
+    $Components::returnCode = Components::results::NS_OK;
+  }
+  return $pkg;
+}
+</pre></div><p>The important items to note in this example are the use of the
+standard Perl convention of making the blessed object a hash reference in which
+the objects attributes can be stored and the
+<tt>QueryInterface</tt> method. For nearly all case, the format
+of the example QueryInterface can apply to any component. Another item to take
+note of is the example's <tt>value</tt> method. The 
+<tt>value</tt> item is an attribute of the 
+<tt>nsISample</tt> interface. Perl XPCOM treats interface
+attributes as subroutines, much like C++, however, only one subroutine is
+used. If the subroutine recieves an argument, then it is the setter method,
+otherwise it is the getter method.</p></div></div><div class="sect1"><a name="d35e336"></a><div class="titlepage"><div><h2 class="title" style="clear: all"><a name="d35e336"></a><span class="title">Assorted Implementation Idioms</span></h2></div></div><p>This section covers a grab bag of topics covering areas in which the 
+behavior of this package may not follow exact XPCOM or Perl module conventions.</p><div class="sect2"><a name="d35e341"></a><div class="titlepage"><div><h3 class="title"><a name="d35e341"></a><span class="title">Convenience Macros</span></h3></div></div><p>To simplify and clarify Perl XPCOM programming, the package
+provides the following macros for you to use.</p><p>PR_TRUE and PR_FALSE - Fairly self explanatory I
+think. These macros exist to make the intent of code more clear, instead of 1
+and 0 values.</p><p>NS_SUCCEEDED - This macro serves as a test facility for
+checking the return values of XPCOM method calls. NS_SUCCEEDED is a shorthand
+method of saying
+<tt>Components::isSuccessCode($Components::returnCode)</tt>, which
+obviously is a bit cumbersome and becomes a pain to type after about 100
+times... The format of this macro fits well into the Perl style of programming
+by making terminal error traps easy to do. For example:</p><pre class="programlisting">
+$anObject-&gt;someMethod();
+die "Call to someMethod() failed." unless NS_SUCCEEDED;
+</pre></div><div class="sect2"><a name="components.wrapobject"></a><div class="titlepage"><div><h3 class="title"><a name="components.wrapobject"></a><span class="title">When Components::WrapObject() Isn't Cheating</span></h3></div></div><p>The XPCOM Perl module provides a method called
+<tt>Components::WrapObject()</tt> which takes a blessed Perl scalar
+and an interface ID as its arguments and returns the perl object wrapped in an
+XPCOM object which is identified by the interface ID given. This function exists 
+for two, and only two cases. The first case is for allowing a perl object which
+implements an XPCOM interface to pass itself as an argument to another XPCOM
+method. This requires a bit of explanation. In this package, when implementing
+an XPCOM interface in Perl, you write a perl class like you would typically
+write a perl class. The problem is that the Perl objects handle on itself within 
+its own subroutines is the raw blessed perl object, not a pointer to an XPCOM
+object. As a result the Perl object can't pass itself off as an XPCOM object to
+a method of another XPCOM class without some help (look at the previous
+nsSample::SampleImpl perl package example as a reference if I've lost you. I
+know this explanation sucks.). By using the Components::WrapObject() method, a
+perl class can pass an instance of itself as an argument. Using the nsSample
+example as a reference, say that it wanted to notify an observer of some kind
+that a method had been called. The observer's interface expects an nsISupports
+pointer. This is how you'd do it:</p><pre class="programlisting">
+# An excerpt from the earlier nsSample::SampleImpl example
+sub writeValue {
+  my ($pkg, $aPrefix) = @_;
+  # Notify some fictional observer we've been called. For the sake of
+  # simplicity, this example pretends the observer is held as an
+  # attribute of the object
+  my $nsSELF = Components::WrapObject($pkg,
+                                                           $Components::interfaces{nsISupports});
+  $pkg-&gt;{myObserver}-&gt;observe("writeValue", $nsSELF);
+  print "nsSample::writeValue =&gt; $aPrefix".$pkg-&gt;{value}."\n";
+  $Components::returnCode = Components::results::NS_OK;
+}
+</pre><p>The second situation where WrapObject is appropriate is the inline 
+declaration of components. By that I mean for times where, if writing a program
+in Perl which uses XPCOM and you want to expose part of the program to XPCOM by
+defining some packages which implement XPCOM interfaces and a factory package to 
+create instances of them that is registered when the script is run via
+<tt>nsIComponentManager::registerFactory()</tt>. I have some
+examples of this which I'll get merged into the docs shortly, along with a
+better explanation Real Soon Now. :)</p><p>The WrapObject method should <i>not</i> be used for
+anything outside of these two cases. Not only would it be cheating, use outside
+of the two cases I've mentioned will most likely result in stability problems.</p></div></div></div></body></html>

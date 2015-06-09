@@ -1,0 +1,94 @@
+
+This is the quick-n-dirty instructions for getting up and running with 
+Perl XPCOM in mozilla on Unix. For detailed instructions, see the README file
+in this directory.
+
+Untar the perl XPCOM package into mozilla's extensions directory.
+
+Add the following Makefiles into allmakefiles.sh in the top mozilla dir:
+(Hint: Search for the name of another extensions directory and you'll find 
+where you need to add these.)
+
+        # This section of code is already in allmakefiles.sh. I put it
+        # here to give you a reference for navigating this file.
+        p3p ) MAKEFILES_extensions="$MAKEFILES_extensions
+            extensions/p3p/Makefile
+            extensions/p3p/public/Makefile
+            extensions/p3p/resources/Makefile
+            extensions/p3p/resources/content/Makefile
+            extensions/p3p/resources/locale/Makefile
+            extensions/p3p/resources/locale/en-US/Makefile
+            extensions/p3p/resources/skin/Makefile
+            extensions/p3p/src/Makefile
+            " ;;
+        # This is the part you need to add. Cut and paste this into
+        # allmakefiles.sh
+        perl ) MAKEFILES_extensions="$MAKEFILES_extensions
+            extensions/perl/Makefile
+            extensions/perl/XPCOM/Makefile
+            extensions/perl/src/Makefile
+            extensions/perl/tests/Makefile
+            extensions/perl/public/Makefile
+            " ;;
+        # Done
+
+Add the following line to the .mozconfig file in the top mozilla dir:
+  ac_add_options --enable-extensions=default,perl
+
+You may also want to add --disable-pedantic, if it does not compile.
+
+Build mozilla depending of your installation (you have to use GNU make):
+
+  make -f client.mk build
+
+or
+
+  ./configure && make
+
+When done building go into the extensions/perl/XPCOM directory and as root 
+run:
+
+  make module_install
+
+This installs the perl module parts of the package into your perl installation.
+
+You should now have a perl enabled mozilla. If you made a debug build you 
+should also have an nsTestPerlSample test in the dist/bin directory of your 
+tree.
+
+***** BEGIN LICENSE BLOCK *****
+Version: MPL 1.1/GPL 2.0/LGPL 2.1
+
+The contents of this file are subject to the Mozilla Public License Version
+1.1 (the "License"); you may not use this file except in compliance with
+the License. You may obtain a copy of the License at
+http://www.mozilla.org/MPL/
+
+Software distributed under the License is distributed on an "AS IS" basis,
+WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+for the specific language governing rights and limitations under the 
+License.
+
+The Original Code is the Perl XPCOM language bindings.
+
+The Initial Developer of the Original Code is
+Jumpline.com, Inc. Portions created by Jumpline.com, Inc. are
+Copyright (C) 2001 Jumpline.com, Inc. All Rights Reserved.
+
+Contributor(s):
+Matt Kennedy <matt@jumpline.com> (original author) 
+
+Alternatively, the contents of this file may be used under the terms of
+either the GNU General Public License Version 2 or later (the "GPL"), or
+the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),
+in which case the provisions of the GPL or the LGPL are applicable instead
+of those above. If you wish to allow use of your version of this file only
+under the terms of either the GPL or the LGPL, and not to allow others to
+use your version of this file under the terms of the MPL, indicate your
+decision by deleting the provisions above and replace them with the notice
+and other provisions required by the GPL or the LGPL. If you do not delete
+the provisions above, a recipient may use your version of this file under
+the terms of any one of the MPL, the GPL or the LGPL.
+
+***** END LICENSE BLOCK *****
+

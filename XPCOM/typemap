@@ -1,0 +1,37 @@
+
+TYPEMAP
+const char * T_PV
+nsresult    T_UV
+PRUint8     T_UV
+PRUint16    T_UV
+PRUint32    T_UV
+PRUint64    T_UV
+PRInt8      T_IV
+PRInt16     T_IV
+PRInt32     T_IV
+PRInt64     T_IV
+
+nsISupports *     SUPPORT_OBJECT
+rawISupports *  RAWSUPPORT_OBJECT
+nsID *            ID_OBJECT
+const nsID *      ID_OBJECT
+
+OUTPUT
+SUPPORT_OBJECT
+  sv_setref_pv($arg, "XPCOM::nsISupports", (void *)$var);
+
+RAWSUPPORT_OBJECT
+  sv_setref_pv($arg, "rawISupports", (void *)$var);
+
+ID_OBJECT
+  sv_setref_pv($arg, "nsID", (void *)$var);
+
+INPUT
+SUPPORT_OBJECT
+  $var = ($type)SvIV((SV*)SvRV($arg));
+
+RAWSUPPORT_OBJECT
+  $var = ($type)SvIV((SV*)SvRV($arg));
+
+ID_OBJECT
+  $var = ($type)SvIV((SV*)SvRV($arg));

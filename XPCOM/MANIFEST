@@ -1,0 +1,11 @@
+Changes
+Components.xs
+MANIFEST
+Makefile.PL
+README
+XPCOM.pm
+nsISupports.xs
+perlXPUtil.cxx
+perlXPUtil.h
+test.pl
+typemap

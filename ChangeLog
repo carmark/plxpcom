@@ -1,0 +1,107 @@
+2001-10-24 15:24  matt
+
+	* tests/: catclsids.pl, nsSelfTest.pl, plPerlBool.pm: Added tests
+	and examples.
+
+2001-10-24 15:24  matt
+
+	* src/: Makefile.in, plPerlBase.cpp, plPerlComponentLoader.cpp,
+	plPerlXPTCStub.cpp: Cleanups, added plPerlComponentHelper
+	implementation.
+
+2001-10-24 15:22  matt
+
+	* public/Makefile.in: Renamed module name because the old name was
+	poor use of namespace.
+
+2001-10-24 15:21  matt
+
+	* doc/: xpcom-perl.html, xpcom-perl.xml: Update docs for new stuff.
+
+2001-10-24 15:21  matt
+
+	* XPCOM/: GenericFactory/GenericFactory.pm,
+	GenericModule/GenericModule.pm: Update version number.
+
+2001-10-24 15:21  matt
+
+	* XPCOM/: Components.xs, Makefile.in, XPCOM.pm: Implemented
+	Components::WrapObject and Components::Manager
+
+2001-10-24 15:21  matt
+
+	* ChangeLog, README: Added ChangeLog
+
+2001-10-22 23:13  matt
+
+	* src/plPerlComponentLoader.cpp: Fix for the new frozen
+	nsIObserverService, which the perl component loader sends
+	notification events to.
+	
+	Maintains back compatibility with the old API as that is what
+	everyone is currently using unless their on the bleeding edge of
+	the Mozilla HEAD branch.
+
+2001-10-22 17:15  matt
+
+	* XPCOM/Makefile.in: Minor dependency fix that was breaking builds
+	in Mozilla.
+
+2001-10-22 15:36  matt
+
+	* INSTALL, README: Updated install stuff for added public
+	directory.
+
+2001-10-22 15:27  matt
+
+	* Makefile.in, XPCOM/Components.xs, XPCOM/Makefile.PL,
+	XPCOM/XPCOM.pm, XPCOM/nsISupports.xs, XPCOM/perlXPUtil.cxx,
+	XPCOM/perlXPUtil.h, public/Makefile.in,
+	public/plIPerlComponentHelper.idl, src/Makefile.in,
+	src/perlXPUtil.h, src/plPerlBase.cpp,
+	src/plPerlComponentLoader.cpp, src/plPerlXPCOM_Base.h,
+	src/plPerlXPModule.cpp, src/plPerlXPTCStub.cpp,
+	tests/nsTestPerlSample.cpp: 
+	Added supports for DOMString types, so Mozilla core DOM API is
+	fully accessible now (including all the XML extras stuff).
+	
+	Initial support for the array type (input only right now). Output
+	arrays are yet to be done, plus perl components cannot implement
+	array types themselves.
+	
+	Self referential support has been added via the
+	Components::WrapObject() subroutine. This wraps a perl blessed
+	object in an XPCOM binding. This allows perl component objects to
+	pass pointers to themselves to other XPCOM methods.
+
+2001-10-12 14:13  matt
+
+	* src/plPerlBase.cpp: Fix compile time error on newer gcc.
+
+2001-10-09 23:10  matt
+
+	* XPCOM/Makefile.in, src/Makefile.in: Landed changes for new
+	sandbox and build layout.
+
+2001-10-09 17:29  matt
+
+	* INSTALL, Makefile.in, README, XPCOM/Changes, XPCOM/Components.xs,
+	XPCOM/MANIFEST, XPCOM/Makefile.PL, XPCOM/Makefile.in, XPCOM/README,
+	XPCOM/XPCOM.pm, XPCOM/nsISupports.xs, XPCOM/perlXPUtil.cxx,
+	XPCOM/perlXPUtil.h, XPCOM/test.pl, XPCOM/typemap,
+	XPCOM/GenericFactory/Changes,
+	XPCOM/GenericFactory/GenericFactory.pm,
+	XPCOM/GenericFactory/MANIFEST, XPCOM/GenericFactory/Makefile.PL,
+	XPCOM/GenericFactory/README, XPCOM/GenericFactory/test.pl,
+	XPCOM/GenericModule/Changes, XPCOM/GenericModule/GenericModule.pm,
+	XPCOM/GenericModule/MANIFEST, XPCOM/GenericModule/Makefile.PL,
+	XPCOM/GenericModule/test.pl, doc/docbook.css, doc/xpcom-perl.html,
+	doc/xpcom-perl.xml, src/Makefile.in, src/Makefile.viper,
+	src/perlXPUtil.cpp, src/perlXPUtil.h, src/plPerlBase.cpp,
+	src/plPerlComponentLoader.cpp, src/plPerlFactory.cpp,
+	src/plPerlModule.cpp, src/plPerlXPCOM_Base.h,
+	src/plPerlXPModule.cpp, src/plPerlXPTCStub.cpp, src/xcDll.cpp,
+	src/xcDll.h, tests/Makefile.in, tests/nsISample.idl,
+	tests/nsSample.pm, tests/nsTestPerlSample.cpp: Checking in updated
+	Perl XPCOM in its new location.
+
